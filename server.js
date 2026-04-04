@@ -29,9 +29,11 @@ app.use('/api', require('./routes/documentRoutes'))
 app.use('/api', require('./controllers/GraphController'))
 app.use('/api', require('./controllers/bankContrroller'))
 // schemaName.index({ request: 'text' });  
-const PORT = process.env.PORT || 8000
-app.listen(PORT, () => {
-    console.log(`server is running on ${PORT}`)
-})
+if (!process.env.VERCEL) {
+    const PORT = process.env.PORT || 8000
+    app.listen(PORT, () => {
+        console.log(`server is running on ${PORT}`)
+    })
+}
 
 module.exports = app;
