@@ -1,0 +1,7 @@
+aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 637423600225.dkr.ecr.ap-south-1.amazonaws.com
+docker build -t pmctender .
+
+docker tag pmctender:latest 637423600225.dkr.ecr.ap-south-1.amazonaws.com/pmctender:latest
+docker push 637423600225.dkr.ecr.ap-south-1.amazonaws.com/pmctender:latest
+
+aws lambda update-function-code --function-name pmctender --image-uri 637423600225.dkr.ecr.ap-south-1.amazonaws.com/pmctender:latest

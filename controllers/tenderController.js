@@ -15,7 +15,7 @@ const AWS = require('aws-sdk');
 // });
 
 // const s3 = new S3({ client: s3Client });
-// console.log(s3,'s3');
+// ////console.log(s3,'s3');
 const s3 = new AWS.S3({
     accessKeyId: process.env.AWS_ACCESS_KEY,
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
@@ -26,7 +26,7 @@ const s3 = new AWS.S3({
 const upload = multer({
     storage: multerS3({
         s3: s3,
-        bucket: 'bhole.co-prod-data',
+        bucket: 'dcpr',
         acl: 'public-read',
         metadata: function (req, file, cb) {
             cb(null, { fieldName: file.fieldname });
@@ -58,25 +58,26 @@ exports.createTender = async (req, res) => {
 
         try {
             // req.body.user = req.user.id
+            console.log(req.body)
             const tender = await Tender.create(req.body);
-            await tender.save();
+            // await tender.save();
 
             // const sendEmail = require('./sendEmail'); // adjust the path according to your project structure
 
-            const createTender = async (req, res) => {
-                try {
-                    req.body.user = req.user.id
-                    const tender = await Tender.create(req.body);
-                    await tender.save();
+            // const createTender = async (req, res) => {
+            //     try {
+            //         req.body.user = req.user.id
+            //         const tender = await Tender.create(req.body);
+            //         await tender.save();
 
-                    // prepare email data
+            //         // prepare email data
 
-                    return res.status(200).json({ message: "'saved in database'", data: tender });
-                } catch (err) {
-                    console.error(err);
-                    res.status(500).send('Failed to saved in database');
-                }
-            }
+            //         return res.status(200).json({ message: "'saved in database'", data: tender });
+            //     } catch (err) {
+            //         console.error(err);
+            //         res.status(500).send('Failed to saved in database');
+            //     }
+            // }
 
             return res.status(200).json({ message: "'saved in database'", data: tender });
         } catch (err) {
@@ -84,25 +85,25 @@ exports.createTender = async (req, res) => {
             res.status(500).send('Failed to saved in database');
         }
     } catch (err) {
-        console.log(err);
+        ////console.log(err);
     }
 }
 exports.getTender = async (req, res) => {
     try {
         const tenders = await Tender.find();
-        console.log(tenders, 'ten')
+        ////console.log(tenders, 'ten')
         return res.status(200).json({
             message: "Tender fetch",
             count: tenders.length,
             tenders
         });
     } catch (err) {
-        console.log(err);
+        ////console.log(err);
     }
 }
 
 // exports.updateTender = async (req, res) => {
-//     console.log(req.body, 'req.body')
+//     ////console.log(req.body, 'req.body')
 //     try {
 //         const { name, amd, description, Value, doc, role, startDate, endDate, user, seller, admin } = req.body;
 
@@ -136,11 +137,11 @@ exports.getTender = async (req, res) => {
 //             res.status(200).json(tender);
 //         });
 //     } catch (err) {
-//         console.log(err);
+//         ////console.log(err);
 //     }
 // }
 // exports.updateTender = async (req, res) => {
-//     console.log(req.body, 'req.body')
+//     ////console.log(req.body, 'req.body')
 //     try {
 //         const { name, amd, description, Value, doc, role, startDate, endDate, user, seller, admin } = req.body;
 
@@ -179,28 +180,29 @@ exports.getTender = async (req, res) => {
 //             res.status(200).json(tender);
 //         });
 //     } catch (err) {
-//         console.log(err);
+//         ////console.log(err);
 //     }
 // }
 
 exports.updateTender = async (req, res) => {
     try {
-        const { _id, ...updateData } = req.body;
+        const { _id, selectedValues, ...updateData } = req.body;
 
         // Ensure _id is a valid ObjectId
         // if (!mongoose.Types.ObjectId.isValid(_id)) {
         //     return res.status(400).json({ message: "Invalid ObjectId" });
         // }
-
+        console.log(req.body)
+        updateData.docs = selectedValues
         const tender = await Tender.findByIdAndUpdate(_id, updateData, { new: true });
-
+        // console.log(updateData)
         if (!tender) {
             return res.status(400).json({ message: "Tender not available" });
         }
 
         res.status(200).json(tender);
     } catch (err) {
-        console.log(err);
+        ////console.log(err);
     }
 }
 
@@ -217,14 +219,17 @@ exports.getTenderById = async (req, res) => {
             tender
         });
     } catch (err) {
-        console.log(err);
+        ////console.log(err);
     }
 }
 
 exports.deleteTender = async (req, res) => {
     try {
-        const tender = await Tender.findByIdAndDelete(req.params.id);
-        if (!tender) {
+        console.log(req.params.id)
+        const tender = await Tender.findById(req.params.id);
+
+        const tender1 = await Tender.findByIdAndUpdate(req.params.id,{isDisabled: !tender.isDisabled}, { new: true });
+        if (!tender1) {
             return res.status(400).json({
                 message: "Failed to fetch or delete tender",
             });
@@ -233,7 +238,7 @@ exports.deleteTender = async (req, res) => {
             message: "Tender deleted successfully",
         });
     } catch (err) {
-        console.log(err);
+        ////console.log(err);
     }
 }
 

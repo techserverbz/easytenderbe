@@ -7,7 +7,7 @@ const getUserTenders = async (req, res) => {
     try {
         // Get the user from the request object (set by the auth middleware)
         const user = req.user;
-        console.log(user, 'user')
+        ////console.log(user, 'user')
         // Check if user's role is 'society'
         if (user.role === 'society') {
             // Find all tenders created by the user
@@ -42,7 +42,7 @@ const getSocietyTenders = async (req, res) => {
             return res.status(404).json({ message: 'No tender found for this society with the given ID.' });
         }
 
-        console.log(tender, 'tenders')
+        ////console.log(tender, 'tenders')
         // Step 3: Get all UserTenders that belong to the tenders created by the user
         // const tenderIds = tender.map(tender => tender._id);
         const userTenders = await usertender.find({ name: tenderId }).populate('usertender');

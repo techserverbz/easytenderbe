@@ -9,7 +9,7 @@ const sendEmail = async options => {
             pass: 'zfsm pjmq nrme kbvj'
         }
     });
-    // console.log(transporter)
+    // ////console.log(transporter)
     const message = {
         from: `${process.env.SMTP_FROM_NAME} ${process.env.SMTP_FROM_EMAIL}`,
         to: options.email,

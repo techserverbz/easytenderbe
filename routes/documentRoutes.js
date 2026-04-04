@@ -6,6 +6,8 @@ const documentController = require('../controllers/docementController');
 const { isAuthenticated, authorizeRoles } = require('../middleware/Auth');
 
 
+router.post('/createfolder',documentController.createfolder);
+
 router.post('/upload/document', documentController.uploadDocument);
 
 router.get('/get/documents',isAuthenticated,authorizeRoles('admin'), documentController.getAllDocuments);

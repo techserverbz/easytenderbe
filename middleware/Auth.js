@@ -4,19 +4,20 @@ const user = require('../models/user');
 
 exports.isAuthenticated = async (req, res, next) => {
     try {
-
+        // console.log("hi")
         const token = req.get('Authorization');
-        // console.log(token)
+        // ////console.log(token)
         if (!token) {
             res.status(400).json({
                 success: false,
                 message: "Authentication Faliure"
             })
+            // console.log("two")
             return
         }
         // verfiying the user using jwt token
         const verfiyUser = jwt.verify(token, process.env.JWT);
-        console.log('verfiyr', verfiyUser)
+        // console.log('verfiyr', verfiyUser)
 
         req.user = await user.findById(verfiyUser.id)
 
@@ -29,9 +30,10 @@ exports.isAuthenticated = async (req, res, next) => {
 }
 
 exports.authorizeRoles = (...roles) => {
+    console.log(roles)
     return async (req, res, next) => {
         if (!roles.includes(req.user.role)) {
-            console.log(req.user.role, 'roles');
+            ////console.log(req.user.role, 'roles');
             return next(res.json("roles not allowed"))
         }
         next()

@@ -9,11 +9,11 @@ router.post('/tender/graph', async (req, res) => {
     try {
         const tender = await Tender.findById(req.body.id)
 
-        console.log(tender);
+        ////console.log(tender);
         if (tender) {
             const developersWhoBid = await usertender.find({ 'name': tender._id });
             const totalDevelopers = await usertender.countDocuments();
-            console.log(developersWhoBid.length,'developersWhoBid')
+            ////console.log(developersWhoBid.length,'developersWhoBid')
 
             const graphData = {
                     totalDevelopers: totalDevelopers,
@@ -24,7 +24,7 @@ router.post('/tender/graph', async (req, res) => {
         }
         // const developersWhoBid = await Developer.find({ '_id': { $in: tender.name } });
         // const usersWhoBid = await Developer.find({ '_id': { $in: userTenders.map(ut => ut.usertender) } });
-        // console.log(usersWhoBid,'developersWhoBid')
+        // ////console.log(usersWhoBid,'developersWhoBid')
         // const totalDevelopers = await Developer.countDocuments();
 
         // const graphData = {
