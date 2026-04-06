@@ -1,13 +1,25 @@
-const { default: mongoose } = require('mongoose');
-
-var MongoClient = require('mongodb').MongoClient;
+const mongoose = require('mongoose');
 require("dotenv").config();
-var uri = process.env.URI
 
-// ////console.log(config)
-mongoose.connect(uri).then(() => {
-    
-    console.log("database connection is established")
-}).catch((err) => {
-    ////console.log("error while connecting in database" , err)
-})
+let cached = global._mongooseConnection;
+
+if (!cached) {
+    cached = global._mongooseConnection = { conn: null, promise: null };
+}
+
+const uri = process.env.URI;
+
+if (!cached.promise) {
+    cached.promise = mongoose.connect(uri, {
+        serverSelectionTimeoutMS: 15000,
+        socketTimeoutMS: 45000,
+        maxPoolSize: 10,
+    }).then((m) => {
+        console.log("database connection is established");
+        cached.conn = m;
+        return m;
+    }).catch((err) => {
+        cached.promise = null;
+        console.log("error while connecting to database", err);
+    });
+}
