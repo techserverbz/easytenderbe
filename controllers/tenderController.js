@@ -186,23 +186,18 @@ exports.getTender = async (req, res) => {
 
 exports.updateTender = async (req, res) => {
     try {
-        const { _id, selectedValues, ...updateData } = req.body;
+        const { _id, id, selectedValues, __v, createdAt, ...updateData } = req.body;
 
-        // Ensure _id is a valid ObjectId
-        // if (!mongoose.Types.ObjectId.isValid(_id)) {
-        //     return res.status(400).json({ message: "Invalid ObjectId" });
-        // }
-        console.log(req.body)
         updateData.docs = selectedValues
-        const tender = await Tender.findByIdAndUpdate(_id, updateData, { new: true });
-        // console.log(updateData)
+        const tender = await Tender.findByIdAndUpdate(_id || id, updateData, { new: true });
         if (!tender) {
             return res.status(400).json({ message: "Tender not available" });
         }
 
         res.status(200).json(tender);
     } catch (err) {
-        ////console.log(err);
+        console.log(err);
+        res.status(500).json({ message: "Failed to update tender" });
     }
 }
 
