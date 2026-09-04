@@ -37,42 +37,48 @@ const path = require('path');
 // });
 
 router.post('/tenderapply', async (req, res) => {
-    //console.log(req.body)
-    let existingApplication = await Usertender.findOne({ name: req.body.name, usertender: req.body.usertender });
-    if (existingApplication) {
-        //console.log("here")
-        return res.status(400).send('You have already applied for this tender. Please wait for verification.');
-    }
+    try {
+        if (!req.body.name || !req.body.usertender) {
+            return res.status(400).json({ message: 'name and usertender are required' });
+        }
+        if (!req.body.file) {
+            return res.status(400).json({ message: 'No file uploaded' });
+        }
 
-    if (!req.body.file) {
-        return res.status(400).send('No file uploaded');
-    }
+        const existingApplication = await Usertender.findOne({ name: req.body.name, usertender: req.body.usertender });
+        if (existingApplication) {
+            return res.status(400).json({ message: 'You have already applied for this tender. Please wait for verification.' });
+        }
 
-    const newUsertender = new Usertender({
-        name: req.body.name,
-        usertender: req.body.usertender,
-        file: req.body.file,
-    });
-    const foundUsertender = await Tender.find({ _id: newUsertender.name });
-    const foundUser = await user.find({ _id: newUsertender.usertender });
-
-        const emailOptions = {
-            email: 'pmc.neomodernarch@gmail.com', // your email
-            subject: `Payment Notification`,
-            // message: `You have applied for the tender ${foundUsertender[0].name} and the user is ${foundUser[0].name} and the file is ${newUsertender.file}`
-             message :` Hi this is generated email from the system.
-                ${foundUser[0].name} has applied for the tender ${foundUsertender[0].name},
-             ${foundUsertender[0].title} 
-             . The file is located at ${newUsertender.file}`,
-        };
-
-        // send email
-        await sendEmail(emailOptions,);
-
+        const newUsertender = new Usertender({
+            name: req.body.name,
+            usertender: req.body.usertender,
+            file: req.body.file,
+        });
         await newUsertender.save();
-        res.status(200).json(newUsertender);
-    
-   
+
+        try {
+            const foundTender = await Tender.findById(newUsertender.name);
+            const foundUser = await user.findById(newUsertender.usertender);
+            if (foundTender && foundUser) {
+                await sendEmail({
+                    email: 'pmc.neomodernarch@gmail.com',
+                    subject: 'Payment Notification',
+                    message: ` Hi this is generated email from the system.
+                ${foundUser.name} has applied for the tender ${foundTender.name},
+             ${foundTender.title}
+             . The file is located at ${newUsertender.file}`,
+                });
+            }
+        } catch (emailErr) {
+            console.error('tenderapply email failed:', emailErr && emailErr.message);
+        }
+
+        return res.status(200).json(newUsertender);
+    } catch (err) {
+        console.error('tenderapply error:', err);
+        return res.status(500).json({ message: 'Failed to submit tender application', error: err && err.message });
+    }
 });
 
 
